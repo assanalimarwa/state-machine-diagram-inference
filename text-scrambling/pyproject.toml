@@ -1,0 +1,63 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "text-scrambling"
+version = "0.0.1"
+description = "Detect the text in the diagram and replace it with random technobabble."
+readme = "README.md"
+requires-python = ">=3.7"
+
+# Optional authors and maintainers fields
+authors = [
+    { name = "Assanali Aidarkhan", email = "assanali.aidarkhan@nu.edu.kz" }
+]
+
+# Project dependencies
+dependencies = [
+    "tensorflow==2.15",
+    "opencv-python==4.10.0.84",
+    "opencv-contrib-python==4.10.0.84",
+    "opencv-python-headless==4.10.0.84",
+    "keras_ocr==0.9.3"
+]
+
+# Optional table for additional metadata
+[project.urls]
+repository = "https://github.com/assanalimarwa/state-machine-diagram-inference"
+
+# Optional license field
+license = "MIT"
+
+[tool.setuptools.packages.find]
+include = ["text_scrambling"]
+exclude = ["precommit.py"]
+
+[project.scripts]
+scramble-text = "text_scrambling.main:main"
+
+# Development dependencies
+[tool]
+[tool.black]
+line-length = 88
+
+[tool.pylint]
+disable = ["too-many-locals", "no-member"]
+
+[tool.mypy]
+python_version = "3.8"
+strict = true
+
+[[tool.mypy.overrides]]
+module = "keras_ocr"
+ignore_missing_imports = true
+
+
+
+[project.optional-dependencies]
+dev = [
+    "black==24.8.0",
+    "pylint==3.2.7",
+    "mypy==1.5.1",
+]
