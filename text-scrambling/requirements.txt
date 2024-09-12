@@ -1,6 +1,0 @@
-tensorflow==2.15
-keras==3.4.1
-opencv-python==4.10.0.84
-opencv-contrib-python==4.10.0.84
-opencv-python-headless==4.10.0.84
-networkx

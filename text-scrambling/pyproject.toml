@@ -20,7 +20,9 @@ dependencies = [
     "opencv-python==4.10.0.84",
     "opencv-contrib-python==4.10.0.84",
     "opencv-python-headless==4.10.0.84",
-    "keras_ocr==0.9.3"
+    "keras_ocr==0.9.3",
+    "networkx",
+    "icontract>=2.6.6,<3"
 ]
 
 # Optional table for additional metadata
