@@ -11,6 +11,7 @@ import cv2
 import keras_ocr
 import numpy as np
 import networkx.utils.union_find
+from icontract import ensure
 
 WORDS_LIST = [
     'API', 'CPU', 'RAM', 'SSD', 'HDD', 'GPU', 'IDE', 'CLI', 'GUI', 'DNS',
@@ -41,14 +42,38 @@ class Box:
     xmax: int
     ymax: int
 
+def compute_box_with_padding(box: Box, percentage: float) -> Box:
+    """Add padding to the box."""
+    width = box.xmax - box.xmin + 1
+    new_xmin = box.xmin - int(round(percentage * width))
+    new_xmax = box.xmax + int(round(percentage * width))
+
+    height = box.ymax - box.ymin + 1
+    new_ymin = box.ymin - int(round(percentage * height))
+    new_ymax = box.ymax + int(round(percentage * height))
+
+    return Box(
+        xmin=new_xmin,
+        xmax=new_xmax,
+        ymin=new_ymin,
+        ymax=new_ymax
+    )
 
 
-def boxes_intersect(that: Box, other: Box) -> bool:
-    """Check whether two rectangles intersect."""
+def boxes_intersect_with_padding(that: Box, other: Box) -> bool:
+    """
+    Check whether two rectangles intersect with some padding.
+
+    This is useful so that we can join detected words across underscores and whitespace.
+    """
+    that_box_with_padding = compute_box_with_padding(that, percentage=0.1)
+    other_box_with_padding = compute_box_with_padding(other, percentage=0.1)
+
     return (
-            (that.xmin <= other.xmin <= that.xmax)
-            and (
-                    that.ymin <= other.ymin <= that.ymax)
+            (that_box_with_padding.xmin <= other_box_with_padding.xmax)
+            and (other_box_with_padding.xmin <= that_box_with_padding.xmax)
+            and (that_box_with_padding.ymin <= other_box_with_padding.ymax)
+            and (other_box_with_padding.ymin <= that_box_with_padding.ymax)
     )
 
 
@@ -61,6 +86,19 @@ def join_boxes(that: Box, other: Box) -> Box:
         ymax=max(that.ymax, other.ymax),
     )
 
+
+# fmt: off
+@ensure(
+    lambda result:
+    all(
+        not boxes_intersect_with_padding(box, another_box)
+        for i, box in enumerate(result)
+        for j, another_box in enumerate(result)
+        if i != j
+    ),
+    "The resulting boxes should not have any intersections."
+)
+# fmt: on
 def suppress(boxes: Sequence[Box]) -> List[Box]:
     """Join all the overlapping boxes together."""
     groups = []  # type: List[Tuple[int, int]]
@@ -70,7 +108,7 @@ def suppress(boxes: Sequence[Box]) -> List[Box]:
         for j in range(i + 1, len(boxes)):
             another_box = boxes[j]
 
-            if boxes_intersect(that=box, other=another_box):
+            if boxes_intersect_with_padding(that=box, other=another_box):
                 groups.append((i, j))
 
     union_find = networkx.utils.UnionFind()
@@ -94,6 +132,7 @@ def suppress(boxes: Sequence[Box]) -> List[Box]:
         result.append(merged_box)
 
     return result
+
 
 def detect_and_replace_text(
         image_path: pathlib.Path, output_path: pathlib.Path
@@ -123,10 +162,17 @@ def detect_and_replace_text(
         ymax = int(bottom_right[1])
 
         # NOTE (mristin):
-        # We widen the box a little bit to account for underscores.
+        # We make the box a little larger to account for underscores and completely
+        # mask the original text.
+
+        # TODO (mristin, 2024-09-12): move this to intersect 🠒 boxes_intersect_with_padding
         width = xmax - xmin + 1
-        xmin -= int(round(0.2 * width))
-        xmax += int(round(0.2 * width))
+        xmin -= int(round(0.1 * width))
+        xmax += int(round(0.1 * width))
+
+        height = ymax - ymin + 1
+        ymin -= int(round(0.1 * height))
+        ymax += int(round(0.1 * height))
 
         box = Box(
             xmin=xmin,
@@ -139,7 +185,7 @@ def detect_and_replace_text(
 
     bounding_boxes = suppress(bounding_boxes)
 
-    for box in bounding_boxes:
+    for i, box in enumerate(bounding_boxes):
         # Draw the polygon on the mask
         cv2.rectangle(
             image_bgr,
