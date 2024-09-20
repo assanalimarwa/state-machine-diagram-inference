@@ -1,0 +1,53 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "experiment-0"
+version = "0.0.1"
+description = "Test and evaluate how well LLMs infer the state machines."
+readme = "README.md"
+requires-python = ">=3.8"
+
+# Optional authors and maintainers fields
+authors = [
+    { name = "Assanali Aidarkhan", email = "assanali.aidarkhan@nu.edu.kz" }
+]
+
+# Project dependencies
+dependencies = [
+    "icontract>=2.6.6,<3"
+]
+
+# Optional table for additional metadata
+[project.urls]
+repository = "https://github.com/assanalimarwa/state-machine-diagram-inference"
+
+# Optional license field
+license = "MIT"
+
+[tool.setuptools.packages.find]
+include = ["experiment0"]
+exclude = ["precommit.py"]
+
+[project.scripts]
+experiment0-rund-and-evaluate = "experiment0.run_and_evaluate:main"
+
+# Development dependencies
+[tool]
+[tool.black]
+line-length = 88
+
+[tool.pylint]
+disable = ["too-many-locals", "no-member"]
+
+[tool.mypy]
+python_version = "3.8"
+strict = true
+
+[project.optional-dependencies]
+dev = [
+    "black==24.8.0",
+    "pylint==3.2.7",
+    "mypy==1.5.1",
+]
