@@ -4,11 +4,12 @@ import argparse
 import os
 import base64
 import re
-from typing import List
+from typing import List, Dict
 
 import requests
 import pathlib
 import sys
+from collections import defaultdict
 
 import openai
 from openai import OpenAI
@@ -16,8 +17,8 @@ from openai import OpenAI
 EDGE_RE = re.compile(r'^\s*(?P<source>.+)\s*-+>\s*(?P<target>.+)\s*$')
 
 
-def extract_edges(text: str) -> List[str]:
-    result = []  # type: List[str]
+def extract_edges(text: str) -> Dict[str, List[str]]:
+    result = defaultdict(list)
 
     for line in text.splitlines():
         stripped = line.strip()
@@ -31,7 +32,7 @@ def extract_edges(text: str) -> List[str]:
         source = match.group("source")
         target = match.group("target")
 
-        result.append(f"{source} -> {target}")
+        result[source].append(target)
 
     return result
 
@@ -133,8 +134,9 @@ def main() -> int:
         print("There were no edges inferred.", file=sys.stderr)
         return 0
 
-    for edge in edges:
-        print(edge)
+    for node, neighbors in edges.items():
+        for neighbor in neighbors:
+            print(f"{node} -> {neighbor}")
 
     return 0
 
