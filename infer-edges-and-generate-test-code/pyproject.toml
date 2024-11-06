@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "infer-edges-and-generate-test-code"
+version = "0.0.1"
+
+description = "Infer edges from a state diagram and generate the test code for a state machine."
+
+readme = "README.md"
+requires-python = ">=3.8"
+authors = [
+    { name = "Assanali Aidarkhan", email = "assanali.aidarkhan@nu.edu.kz" },
+    { name = "Marko Ristin", email = "marko@ristin.ch" },
+    { name = "Bjoern Otto", email = "bjoern.otto@ifak.eu" }
+]
+dependencies = [
+    "openai==1.54.1",
+    "requests==2.32.3"
+]
+
+[project.scripts]
+infer-edges = "infer_edges_and_generate_test_code.infer_edges:main"
+
+[tool.setuptools.packages.find]
+include = ["infer_edges_and_generate_test_code"]
