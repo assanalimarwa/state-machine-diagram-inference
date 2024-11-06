@@ -11,13 +11,15 @@ import pathlib
 import sys
 from collections import defaultdict
 
+from .generate_code import AdjacencyMat
+
 import openai
 from openai import OpenAI
 
 EDGE_RE = re.compile(r'^\s*(?P<source>.+)\s*-+>\s*(?P<target>.+)\s*$')
 
 
-def extract_edges(text: str) -> Dict[str, List[str]]:
+def extract_edges(text: str) -> AdjacencyMat:
     result = defaultdict(list)
 
     for line in text.splitlines():
