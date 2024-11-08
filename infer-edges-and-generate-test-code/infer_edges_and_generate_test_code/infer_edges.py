@@ -1,42 +1,13 @@
 """Infer edges of a state diagram."""
 
 import argparse
-import os
 import base64
-import re
-from typing import List, Dict
-
-import requests
 import pathlib
 import sys
-from collections import defaultdict
-
-from .generate_code import AdjacencyMat
 
 import openai
-from openai import OpenAI
 
-EDGE_RE = re.compile(r'^\s*(?P<source>.+)\s*-+>\s*(?P<target>.+)\s*$')
-
-
-def extract_edges(text: str) -> AdjacencyMat:
-    result = defaultdict(list)
-
-    for line in text.splitlines():
-        stripped = line.strip()
-        if len(stripped) == 0:
-            continue
-
-        match = EDGE_RE.match(stripped)
-        if match is None:
-            continue
-
-        source = match.group("source")
-        target = match.group("target")
-
-        result[source].append(target)
-
-    return result
+from infer_edges_and_generate_test_code.common import extract_edges
 
 
 def main() -> int:
@@ -48,10 +19,16 @@ def main() -> int:
         help="Path to the file containing ChatGPT API key",
         required=True
     )
+    parser.add_argument(
+        "--output_path",
+        help="Path to the file to store the results; if '-', write to STDOUT",
+        default='-'
+    )
     args = parser.parse_args()
 
     image_path = pathlib.Path(args.image_path)
     chatgpt_api_key_path = pathlib.Path(args.chatgpt_api_key_path)
+    output_path = pathlib.Path(args.output_path) if args.output_path != '-' else None
 
     if not image_path.exists():
         print(
@@ -136,9 +113,21 @@ def main() -> int:
         print("There were no edges inferred.", file=sys.stderr)
         return 0
 
-    for node, neighbors in edges.items():
-        for neighbor in neighbors:
-            print(f"{node} -> {neighbor}")
+    if output_path is None:
+        output = sys.stdout
+        fid = None
+    else:
+        output_path.parent.mkdir(exist_ok=True, parents=True)
+        fid = output_path.open("wt")
+        output = fid
+
+    try:
+        for node, neighbors in edges.items():
+            for neighbor in neighbors:
+                print(f"{node} -> {neighbor}", file=output)
+    finally:
+        if fid is not None:
+            fid.close()
 
     return 0
 

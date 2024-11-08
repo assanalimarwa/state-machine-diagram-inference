@@ -1,11 +1,15 @@
 #! /usr/bin/env python3
 
-from typing import Dict, List
+"""Generate the source code based on the edges."""
 
-AdjacencyMat = Dict[str, List[str]]
+import argparse
+import pathlib
+import sys
+
+from infer_edges_and_generate_test_code.common import AdjacencyMat, extract_edges
 
 
-def generate_code(mat: AdjacencyMat):
+def generate_code(mat: AdjacencyMat) -> None:
     all_nodes = set(mat.keys())
     for neighbors in mat.values():
         for neighbor in neighbors:
@@ -73,15 +77,35 @@ def generate_code(mat: AdjacencyMat):
     print("}")
 
 
-# Try out using  ./generate_code.py  > sample.cpp && g++ sample.cpp
-if __name__ == "__main__":
-    example = {
-        'JVM': ['ERP'],
-        'ERP': ['ERP', 'CDN'],
-        'CDN': ['ERP', 'CDN', 'USB', 'WWW'],
-        'USB': ['USB', 'LTE', 'ERP', 'WWW'],
-        'LTE': ['LTE', 'WWW', 'ERP', 'CDN'],
-        'WWW': ['WWW', 'ERP', 'CDN'],
-    }
-    generate_code(example)
+def main() -> int:
+    """Execute the main routine."""
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--input_path",
+        help="Path to the file containing the edges; if '-', read from STDIN",
+        required=True
+    )
+    args = parser.parse_args()
 
+    input_path = (
+        pathlib.Path(args.input_path)
+        if args.input_path != '-'
+        else None
+    )
+
+    if input_path is None:
+        text = sys.stdin.read()
+    else:
+        text = input_path.read_text(encoding='utf-8')
+
+    adjacency_matrix = extract_edges(text)
+    if len(adjacency_matrix) == 0:
+        return 0
+
+    generate_code(adjacency_matrix)
+
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

@@ -17,11 +17,14 @@ authors = [
 ]
 dependencies = [
     "openai==1.54.1",
-    "requests==2.32.3"
+    "requests==2.32.3",
+    "networkx==3.4.2"
 ]
 
 [project.scripts]
 infer-edges = "infer_edges_and_generate_test_code.infer_edges:main"
+generate-code = "infer_edges_and_generate_test_code.generate_code:main"
+generate-tests = "infer_edges_and_generate_test_code.generate_tests:main"
 
 [tool.setuptools.packages.find]
 include = ["infer_edges_and_generate_test_code"]
