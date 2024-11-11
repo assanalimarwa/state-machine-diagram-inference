@@ -18,11 +18,14 @@ def generate_tests(mat: AdjacencyMat):
             graph.add_edge(node, neighbor)
     start_node = next(iter(mat.keys()))
     for node in graph.nodes:
-        yield (
-            node,
-            nx.shortest_path(graph, start_node, node) +
-            nx.shortest_path(graph, node, start_node)[1:]
-        )
+        try:
+            yield (
+                node,
+                nx.shortest_path(graph, start_node, node) +
+                nx.shortest_path(graph, node, start_node)[1:]
+            )
+        except nx.NetworkXNoPath:
+            continue
 
 
 def main() -> int:
