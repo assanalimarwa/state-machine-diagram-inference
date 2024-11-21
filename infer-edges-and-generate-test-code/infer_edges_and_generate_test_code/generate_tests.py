@@ -4,13 +4,15 @@
 import argparse
 import pathlib
 import sys
+from typing import List, Iterator
 
 import networkx as nx
 
-from infer_edges_and_generate_test_code.common import AdjacencyMat, extract_edges
+from infer_edges_and_generate_test_code.common import AdjacencyMat, extract_edges, analyze
+Path = List[str]
 
 
-def generate_tests(mat: AdjacencyMat):
+def generate_paths(mat: AdjacencyMat) -> Iterator[Path]:
     graph = nx.DiGraph()
     for node, neighbors in mat.items():
         graph.add_node(node)
@@ -26,6 +28,20 @@ def generate_tests(mat: AdjacencyMat):
             )
         except nx.NetworkXNoPath:
             continue
+
+
+def print_test(initial_state: str, target: str, path: Path):
+    print(f"TEST(App, {target})")
+    print("{")
+    print(f"  // CHeck path {path}")
+    print("  Event event;")
+    print(f"  auto state = State::{initial_state};")
+    for node in path:
+        print("  // TODO: fill event appropriately")
+        print("  state = handle_event(state, event);")
+        print(f"  ASSERT_EQ(state, State::{node});")
+    print("}")
+    print()
 
 
 def main() -> int:
@@ -54,15 +70,20 @@ def main() -> int:
     if len(adjacency_matrix) == 0:
         return 0
 
-    if len(adjacency_matrix) == 1:
-        for source, targets in adjacency_matrix.items():
-            for target in targets:
-                print(f"{target}: {source} -> {target}")
+    initial_state, all_nodes = analyze(adjacency_matrix)
 
-        return 1
+    print("#include <gtest/gtest.h>")
+    print("struct Event{};")
+    print("enum class State")
+    print("{")
+    for node in all_nodes:
+        print(f"  {node},")
+    print("};")
+    print("State handle_event(State const state, Event const & evnet);")
+    print()
 
-    for target, path in generate_tests(adjacency_matrix):
-        print(f"{target}: {path}")
+    for target, path in generate_paths(adjacency_matrix):
+        print_test(initial_state, target, path)
 
     return 0
 

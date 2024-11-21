@@ -10,3 +10,4 @@ USB -> WWW
 LTE -> USB
 LTE -> WWW
 WWW -> ERP
+LTE -> JVM

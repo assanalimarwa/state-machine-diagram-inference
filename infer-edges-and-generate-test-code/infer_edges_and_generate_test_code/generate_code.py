@@ -6,15 +6,11 @@ import argparse
 import pathlib
 import sys
 
-from infer_edges_and_generate_test_code.common import AdjacencyMat, extract_edges
+from infer_edges_and_generate_test_code.common import AdjacencyMat, extract_edges, analyze
 
 
 def generate_code(mat: AdjacencyMat) -> None:
-    all_nodes = set(mat.keys())
-    for neighbors in mat.values():
-        for neighbor in neighbors:
-            all_nodes.add(neighbor)
-    initial_state = next(iter(mat.keys()))
+    initial_state, all_nodes = analyze(mat)
 
     print("#include <stdexcept>")
     print("struct Event")

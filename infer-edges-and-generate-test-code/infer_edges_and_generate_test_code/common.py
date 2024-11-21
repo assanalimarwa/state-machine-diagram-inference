@@ -1,6 +1,6 @@
 import re
 from collections import defaultdict
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 AdjacencyMat = Dict[str, List[str]]
 
@@ -37,3 +37,20 @@ def extract_edges(text: str) -> AdjacencyMat:
         result[source].append(target)
 
     return result
+
+
+def analyze(mat: AdjacencyMat) -> Tuple[str, List[str]]:
+    """
+    Analyze an adjaciency matrix to obtain:
+    - the initial state
+    - a list of all nodes
+
+    >>> analyze({'a': ['b', 'c']})
+    ('a', ['a', 'b', 'c'])
+    """
+    all_nodes = set(mat.keys())
+    for neighbors in mat.values():
+        for neighbor in neighbors:
+            all_nodes.add(neighbor)
+    initial_state = next(iter(mat.keys()))
+    return initial_state, all_nodes
