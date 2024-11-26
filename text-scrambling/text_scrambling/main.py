@@ -11,7 +11,7 @@ import cv2
 import keras_ocr
 import numpy as np
 import networkx.utils.union_find
-from icontract import ensure
+from icontract import ensure, require
 
 WORDS_LIST = [
     'API', 'CPU', 'RAM', 'SSD', 'HDD', 'GPU', 'IDE', 'CLI', 'GUI', 'DNS',
@@ -42,6 +42,7 @@ class Box:
     xmax: int
     ymax: int
 
+
 def compute_box_with_padding(box: Box, percentage: float) -> Box:
     """Add padding to the box."""
     width = box.xmax - box.xmin + 1
@@ -60,14 +61,30 @@ def compute_box_with_padding(box: Box, percentage: float) -> Box:
     )
 
 
+def boxes_intersect(that: Box, other: Box) -> bool:
+    """Check whether two rectangles intersect without any padding."""
+    return (
+            (that.xmin <= other.xmax)
+            and (other.xmin <= that.xmax)
+            and (that.ymin <= other.ymax)
+            and (other.ymin <= that.ymax)
+    )
+
+
 def boxes_intersect_with_padding(that: Box, other: Box) -> bool:
     """
     Check whether two rectangles intersect with some padding.
 
     This is useful so that we can join detected words across underscores and whitespace.
+
+    >>> boxes_intersect_with_padding(
+    ...     Box(xmin=834, ymin=197, xmax=968, ymax=219),
+    ...     Box(xmin=332, ymin=211, xmax=787, ymax=268)
+    ... )
+    False
     """
-    that_box_with_padding = compute_box_with_padding(that, percentage=0.1)
-    other_box_with_padding = compute_box_with_padding(other, percentage=0.1)
+    that_box_with_padding = compute_box_with_padding(that, percentage=0.05)
+    other_box_with_padding = compute_box_with_padding(other, percentage=0.05)
 
     return (
             (that_box_with_padding.xmin <= other_box_with_padding.xmax)
@@ -88,10 +105,13 @@ def join_boxes(that: Box, other: Box) -> Box:
 
 
 # fmt: off
+@require(
+    lambda boxes, predicted_texts: len(boxes) == len(predicted_texts)
+)
 @ensure(
     lambda result:
     all(
-        not boxes_intersect_with_padding(box, another_box)
+        not boxes_intersect(box, another_box)
         for i, box in enumerate(result)
         for j, another_box in enumerate(result)
         if i != j
@@ -99,16 +119,47 @@ def join_boxes(that: Box, other: Box) -> Box:
     "The resulting boxes should not have any intersections."
 )
 # fmt: on
-def suppress(boxes: Sequence[Box]) -> List[Box]:
-    """Join all the overlapping boxes together."""
+def suppress(
+        boxes: Sequence[Box],
+        predicted_texts: Sequence[str]
+) -> List[Box]:
+    """Join all the overlapping text boxes together."""
     groups = []  # type: List[Tuple[int, int]]
     for i, box in enumerate(boxes):
         groups.append((i, i))
 
-        for j in range(i + 1, len(boxes)):
+        predicted_text = predicted_texts[i]
+
+        character_width = round((box.xmax - box.xmin) / len(predicted_text))
+        assert character_width >= 0
+
+        box_with_padding = Box(
+            xmin=box.xmin,
+            # NOTE (mristin):
+            # We add one character to the right to account for underscores
+            # and whitespace.
+            xmax=box.xmax + character_width,
+            ymin=box.ymin,
+            # NOTE (mristin):
+            # We add some extension below to account for multiple lines.
+            ymax=round(1.02 * box.ymax)
+        )
+
+        # NOTE (mristin):
+        # We need to compare all boxes against each other as the expansion is not
+        # commutative.
+        for j in range(0, len(boxes)):
+            if i == j:
+                continue
+
             another_box = boxes[j]
 
-            if boxes_intersect_with_padding(that=box, other=another_box):
+            # NOTE (mristin):
+            # We add this check to facilitate future debugging.
+            if boxes_intersect(that=box, other=another_box):
+                assert boxes_intersect(box_with_padding, another_box)
+
+            if boxes_intersect(that=box_with_padding, other=another_box):
                 groups.append((i, j))
 
     union_find = networkx.utils.UnionFind()
@@ -129,6 +180,14 @@ def suppress(boxes: Sequence[Box]) -> List[Box]:
                 )
 
         assert merged_box is not None
+
+        for another_merged_box in result:
+            if boxes_intersect(another_merged_box, merged_box):
+                raise AssertionError(
+                    "Something went wrong. Two merged boxes intersect: "
+                    f"{merged_box=}, {another_merged_box=}"
+                )
+
         result.append(merged_box)
 
     return result
@@ -147,7 +206,12 @@ def detect_and_replace_text(
     image_bgr = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
     bounding_boxes = []  # type: List[Box]
+    predicted_texts = []  # type: List[str]
     for prediction in prediction_groups[0]:
+        predicted_text = prediction[0]
+
+        predicted_texts.append(predicted_text)
+
         box_as_array = prediction[1]
 
         assert isinstance(box_as_array, np.ndarray)
@@ -161,58 +225,93 @@ def detect_and_replace_text(
         xmax = int(bottom_right[0])
         ymax = int(bottom_right[1])
 
-        # NOTE (mristin):
-        # We make the box a little larger to account for underscores and completely
-        # mask the original text.
-
-        # TODO (mristin, 2024-09-12): move this to intersect 🠒 boxes_intersect_with_padding
-        width = xmax - xmin + 1
-        xmin -= int(round(0.1 * width))
-        xmax += int(round(0.1 * width))
-
-        height = ymax - ymin + 1
-        ymin -= int(round(0.1 * height))
-        ymax += int(round(0.1 * height))
+        height = ymax - ymin
 
         box = Box(
             xmin=xmin,
-            ymin=ymin,
+            # NOTE (mristin):
+            # We extend a little bit to the top so that we account for missed
+            # text pixels in the prediction.
+            ymin=max(0, round(ymin - 0.05 * height)),
             xmax=xmax,
             ymax=ymax
         )
 
         bounding_boxes.append(box)
 
-    bounding_boxes = suppress(bounding_boxes)
+    bounding_boxes = suppress(
+        boxes=bounding_boxes,
+        predicted_texts=predicted_texts
+    )
 
     for i, box in enumerate(bounding_boxes):
+        colour_histogram = dict()  # type: MutableMapping[Tuple[int, int, int], int]
+        for y in range(box.ymin, box.ymax + 1):
+            for x in range(box.xmin, box.xmax + 1):
+                pixel = image_bgr[y, x]
+                colour = (int(pixel[0]), int(pixel[1]), int(pixel[2]))
+
+                if colour not in colour_histogram:
+                    colour_histogram[colour] = 1
+                else:
+                    colour_histogram[colour] += 1
+
+        max_colour = None  # type: Optional[Tuple[int, int, int]]
+        max_count = None  # type: Optional[int]
+        for colour, count in colour_histogram.items():
+            if max_count is None:
+                max_colour = colour
+                max_count = count
+            else:
+                if max_count < count:
+                    max_count = count
+                    max_colour = colour
+
+        assert max_colour is not None, f"Unexpected no colour for bounding box {box}"
+
         # Draw the polygon on the mask
         cv2.rectangle(
             image_bgr,
             (box.xmin, box.ymin),
             (box.xmax, box.ymax),
-            (255, 255, 255),
+            max_colour,
             -1
         )
 
     random_labels = select_random_words(count=len(bounding_boxes))
 
-    assert len(random_labels) == len(bounding_boxes)
-
     for box, random_label in zip(bounding_boxes, random_labels):
         width = box.xmax - box.xmin + 1
         height = box.ymax - box.ymin + 1
 
-        # Choose font and scale based on the bounding box height
-        font_scale = height / 25
-        font = cv2.FONT_HERSHEY_SIMPLEX
-        thickness = 1
+        text_width = None
+        text_height = None
 
-        # Get the text size (width and height)
-        text_size = cv2.getTextSize(
-            text=random_label, fontFace=font, fontScale=font_scale, thickness=thickness
-        )[0]
-        text_width, text_height = text_size
+        while True:
+            # Choose font and scale based on the bounding box height
+            font_scale = height / 25
+            font = cv2.FONT_HERSHEY_SIMPLEX
+            thickness = 1
+
+            # Get the text size (width and height)
+            text_size = cv2.getTextSize(
+                text=random_label,
+                fontFace=font,
+                fontScale=font_scale,
+                thickness=thickness
+            )[0]
+            text_width, text_height = text_size
+
+            if text_width < width:
+                break
+
+            if len(random_label) == 1:
+                break
+
+            random_label = random_label[:-1]
+
+        assert text_width is not None
+        assert text_height is not None
 
         # Calculate the position to centralize the text
         text_x = box.xmin + (width - text_width) // 2  # Center horizontally
@@ -251,7 +350,12 @@ def main() -> int:
     output_dir = pathlib.Path(args.output_dir)
 
     for pth in sorted(pth for pth in input_dir.iterdir() if pth.is_file()):
-        detect_and_replace_text(image_path=pth, output_path=output_dir / pth.name)
+        output_path = output_dir / pth.name
+
+        if output_path.exists():
+            print(f"File exists, skipping: {output_path}")
+        else:
+            detect_and_replace_text(image_path=pth, output_path=output_dir / pth.name)
 
     return 0
 
