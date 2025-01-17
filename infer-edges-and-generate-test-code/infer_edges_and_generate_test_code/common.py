@@ -32,7 +32,7 @@ def extract_edges(text: str) -> AdjacencyMat:
             continue
 
         source = match.group("source").strip()
-        target = match.group("target").strip()
+        target = match.group("target").split(",")[0].strip()
 
         result[source].append(target)
 

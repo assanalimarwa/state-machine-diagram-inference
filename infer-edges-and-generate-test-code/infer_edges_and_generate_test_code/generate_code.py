@@ -5,77 +5,81 @@
 import argparse
 import pathlib
 import sys
+from typing import List
 
 from infer_edges_and_generate_test_code.common import AdjacencyMat, extract_edges, analyze
 
 
-def generate_code(mat: AdjacencyMat) -> None:
+def generate_code(mat: AdjacencyMat) -> List[str]:
     initial_state, all_nodes = analyze(mat)
+    ret = []
 
-    print("#include <stdexcept>")
-    print("struct Event")
-    print("{")
-    print("};")
-    print()
+    ret.append("#include <stdexcept>")
+    ret.append("struct Event")
+    ret.append("{")
+    ret.append("};")
+    ret.append("")
 
-    print("enum class State")
-    print("{")
+    ret.append("enum class State")
+    ret.append("{")
     for node in all_nodes:
-        print(f"  {node},")
-    print("};")
-    print()
+        ret.append(f"  {node},")
+    ret.append("};")
+    ret.append("")
 
-    print("std::string format_state(State const state)")
-    print("{")
-    print(f"  switch(state)")
-    print("  {")
+    ret.append("std::string format_state(State const state)")
+    ret.append("{")
+    ret.append(f"  switch(state)")
+    ret.append("  {")
     for node in all_nodes:
-        print(f"    case State::{node}:")
-        print(f'      return "{node}";')
-    print("  }")
-    print('  return "?";')
-    print("}")
-    print()
+        ret.append(f"    case State::{node}:")
+        ret.append(f'      return "{node}";')
+    ret.append("  }")
+    ret.append('  return "?";')
+    ret.append("}")
+    ret.append("")
 
     for node, neighbors in mat.items():
-        print(f"State handle_{node}(Event const & event)")
-        print("{")
-        print("  // Check the event and return one of the following states:")
+        ret.append(f"State handle_{node}(Event const & event)")
+        ret.append("{")
+        ret.append("  // Check the event and return one of the following states:")
         for neighbor in neighbors:
-            print(f"  // - {neighbor}")
-        print(f"  return State::{node};")
-        print("}")
-        print()
+            ret.append(f"  // - {neighbor}")
+        ret.append(f"  return State::{node};")
+        ret.append("}")
+        ret.append("")
 
-    print("State handle_event(State const last_state, Event const & event)")
-    print("{")
-    print("  switch(last_state)")
-    print("  {")
+    ret.append("State handle_event(State const last_state, Event const & event)")
+    ret.append("{")
+    ret.append("  switch(last_state)")
+    ret.append("  {")
     for node in all_nodes:
-        print(f"  case State::{node}:")
-        print(f"    return handle_{node}(event);")
-    print("  default:")
-    print('    throw std::runtime_error("Unknown state " + format_state(last_state));')
-    print("  }")
-    print("}")
-    print()
+        ret.append(f"  case State::{node}:")
+        ret.append(f"    return handle_{node}(event);")
+    ret.append("  default:")
+    ret.append('    throw std::runtime_error("Unknown state " + format_state(last_state));')
+    ret.append("  }")
+    ret.append("}")
+    ret.append("")
 
-    print("Event wait_for_event()")
-    print("{")
-    print("  // TODO fetch next event")
-    print(f"  return Event();")
-    print("}")
-    print()
+    ret.append("Event wait_for_event()")
+    ret.append("{")
+    ret.append("  // TODO fetch next event")
+    ret.append(f"  return Event();")
+    ret.append("}")
+    ret.append("")
 
-    print("int main()")
-    print("{")
-    print(f"  State state = State::{initial_state};")
-    print("  for(;;)")
-    print("  {")
-    print(f"    auto event = wait_for_event();")
-    print("    state = handle_event(state, event);")
-    print("  }")
-    print("}")
+    ret.append("int main()")
+    ret.append("{")
+    ret.append(f"  State state = State::{initial_state};")
+    ret.append("  for(;;)")
+    ret.append("  {")
+    ret.append(f"    auto event = wait_for_event();")
+    ret.append("    state = handle_event(state, event);")
+    ret.append("  }")
+    ret.append("}")
+
+    return ret
 
 
 def main() -> int:
@@ -103,7 +107,9 @@ def main() -> int:
     if len(adjacency_matrix) == 0:
         return 0
 
-    generate_code(adjacency_matrix)
+    lines = generate_code(adjacency_matrix)
+    for line in lines:
+        print(line)
 
     return 0
 

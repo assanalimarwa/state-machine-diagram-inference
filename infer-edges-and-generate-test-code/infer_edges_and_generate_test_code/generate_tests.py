@@ -30,19 +30,37 @@ def generate_paths(mat: AdjacencyMat) -> Iterator[Path]:
             continue
 
 
-def print_test(initial_state: str, target: str, path: Path):
-    print(f"TEST(App, {target})")
-    print("{")
-    print(f"  // CHeck path {path}")
-    print("  Event event;")
-    print(f"  auto state = State::{initial_state};")
+def generate_test(initial_state: str, target: str, path: Path) -> List[str]:
+    ret = []
+    ret.append(f"TEST(App, {target})")
+    ret.append("{")
+    ret.append(f"  // CHeck path {path}")
+    ret.append("  Event event;")
+    ret.append(f"  auto state = State::{initial_state};")
     for node in path:
-        print("  // TODO: fill event appropriately")
-        print("  state = handle_event(state, event);")
-        print(f"  ASSERT_EQ(state, State::{node});")
-    print("}")
-    print()
+        ret.append("  // TODO: fill event appropriately")
+        ret.append("  state = handle_event(state, event);")
+        ret.append(f"  ASSERT_EQ(state, State::{node});")
+    ret.append("}")
+    ret.append("")
+    return ret
 
+def generate_tests(adjacency_matrix: AdjacencyMat) -> List[str]:
+    initial_state, all_nodes = analyze(adjacency_matrix)
+    ret = []
+    ret.append("#include <gtest/gtest.h>")
+    ret.append("struct Event{};")
+    ret.append("enum class State")
+    ret.append("{")
+    for node in all_nodes:
+        ret.append(f"  {node},")
+    ret.append("};")
+    ret.append("State handle_event(State const state, Event const & evnet);")
+    ret.append("")
+
+    for target, path in generate_paths(adjacency_matrix):
+        ret += generate_test(initial_state, target, path)
+    return ret
 
 def main() -> int:
     """Execute the main routine."""
@@ -70,20 +88,9 @@ def main() -> int:
     if len(adjacency_matrix) == 0:
         return 0
 
-    initial_state, all_nodes = analyze(adjacency_matrix)
-
-    print("#include <gtest/gtest.h>")
-    print("struct Event{};")
-    print("enum class State")
-    print("{")
-    for node in all_nodes:
-        print(f"  {node},")
-    print("};")
-    print("State handle_event(State const state, Event const & evnet);")
-    print()
-
-    for target, path in generate_paths(adjacency_matrix):
-        print_test(initial_state, target, path)
+    lines = generate_tests(adjacency_matrix)
+    for line in lines:
+        print(line)
 
     return 0
 
