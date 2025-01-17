@@ -1,0 +1,17 @@
+DOS -> DOS
+DOS -> PPT
+PPT -> DOS
+PPT -> PPT
+PPT -> DPI
+DPI -> BIOS
+BIOS -> BIOS
+BIOS -> JDK 
+JDK -> XSS
+XSS -> MFA
+MFA -> MFA
+MFA -> DOS 
+MFA -> PPT
+XSS -> DOS
+JDK -> DOS
+BIOS -> DOS 
+DPI -> DOS

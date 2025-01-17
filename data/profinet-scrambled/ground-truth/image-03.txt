@@ -1,0 +1,4 @@
+EEP -> RAM
+RAM -> EEP
+EEP -> EEP 
+RAM -> RAM

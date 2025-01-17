@@ -1,0 +1,8 @@
+YML -> YML 
+YML -> CSV 
+CSV -> CSV 
+CSV -> YML
+CSV -> DRM 
+DRM -> CSV 
+DRM -> DRM 
+DRM -> YML

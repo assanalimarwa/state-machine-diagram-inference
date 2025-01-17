@@ -1,0 +1,15 @@
+NTP -> TLD
+TLD -> TLD
+TLD -> SSD
+SSD -> TLD
+SSD -> SSD
+SSD -> GIF
+GIF -> SSD
+GIF -> GIF
+SLA -> SLA
+SLA -> SSH
+SSH -> SSH
+SSH -> TLD
+SSH -> SSD
+SLA -> SSD
+SSD -> SLA

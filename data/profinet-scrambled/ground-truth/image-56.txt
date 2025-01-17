@@ -1,0 +1,9 @@
+ASP -> AIX 
+AIX -> AIX
+AIX -> ASP
+IOT -> IOT
+IOT -> SDK
+SDK -> IOT
+SDK -> ASP
+IOT -> ASP
+AIX -> SDK

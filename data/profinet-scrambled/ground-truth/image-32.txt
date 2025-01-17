@@ -1,0 +1,10 @@
+API -> SIP
+SIP -> SIP 
+SIP -> HDD
+HDD -> SIP
+HDD -> HDD
+HDD -> CSV
+CSV -> HDD
+CSV -> CSV
+CSV -> SIP
+API -> HDD

@@ -1,0 +1,6 @@
+EDI -> MFA 
+MFA -> CPU 
+CPU -> CPU 
+CPU -> VPS 
+VPS -> CPU 
+MFA -> VPS 

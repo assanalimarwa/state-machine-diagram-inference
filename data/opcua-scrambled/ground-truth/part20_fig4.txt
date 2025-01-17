@@ -1,0 +1,9 @@
+X -> RAM, DOS VPS
+RAM -> CP, TLD
+RAM -> GUI, SSH
+GUI -> CP, PPP
+GUI -> X, PHP
+X -> CSS, ICQ
+CSS -> X, WWW
+CSS -> CP, NOC
+CP -> X, DNS 

@@ -1,0 +1,5 @@
+DOS -> ROM 
+ROM -> ROM 
+ROM -> RDS 
+RDS -> ROM 
+RDS -> RDS

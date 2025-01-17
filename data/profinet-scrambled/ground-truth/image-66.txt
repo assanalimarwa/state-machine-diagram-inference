@@ -1,0 +1,15 @@
+RAM -> RAM 
+RAM -> IVR
+IVR -> IVR 
+IVR -> RAM 
+IVR -> TLD 
+TLD -> TLD 
+TLD -> CPL 
+CPL -> CPL 
+CPL -> RDP 
+RDP -> CPL 
+RDP -> RDP 
+RDP -> RAM 
+CPL -> RAM 
+TLD -> RAM 
+RAM -> TLD 

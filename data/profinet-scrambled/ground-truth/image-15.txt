@@ -1,0 +1,8 @@
+LTE -> LTE
+LTE -> CRT
+CRT -> LTE
+CRT -> CRT
+CRT -> CPU
+CPU -> CRT
+CPU -> CPU
+CPU -> LTE

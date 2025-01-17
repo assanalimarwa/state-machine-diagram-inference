@@ -1,0 +1,12 @@
+RSA -> RSA 
+RSA -> IPX 
+IPX -> RSA 
+IPX -> IPX 
+IPX -> LVM 
+LVM -> IPX 
+LVM -> LVM 
+GUI -> GUI
+GUI -> RSA
+GUI -> IPX 
+LVM -> RSA
+IPX -> GUI

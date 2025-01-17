@@ -1,0 +1,7 @@
+WWW -> VNC 
+VNC -> VNC 
+VNC -> VPS 
+VPS -> VPS 
+VPS -> EHR 
+VNC -> EHR 
+EHR -> WWW

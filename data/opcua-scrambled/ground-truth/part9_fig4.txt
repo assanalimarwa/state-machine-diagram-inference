@@ -1,0 +1,7 @@
+TLD -> SIP 
+SIP -> TLD, ICQ
+SIP -> TLD, WWW
+TLD -> AIK, CSS IPX IPV 
+WAN -> AIK 
+AIK -> WAN, AIX 
+AIK -> WAN, BIOS  

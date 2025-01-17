@@ -1,0 +1,4 @@
+SQL -> MAC, USB
+MAC -> MAC, EHR
+MAC -> TCP
+TCP -> SQL, IPX

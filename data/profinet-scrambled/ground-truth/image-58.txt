@@ -1,0 +1,14 @@
+SDK -> AIK 
+AIK -> AIK
+AIK -> IPX
+IPX -> IPX 
+IPX -> DNS 
+DNS -> DNS
+DNS -> EDI 
+EDI -> EDI 
+EDI -> MIM 
+MIM -> MIM 
+MIM -> AIK 
+EDI -> AIK 
+DNS -> AIK 
+IPX -> AIK 

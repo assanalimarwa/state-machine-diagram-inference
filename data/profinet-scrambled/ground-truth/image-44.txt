@@ -1,0 +1,6 @@
+NAT -> DAC
+DAC -> DNS 
+DNS -> DAC
+DNS -> GUI 
+GUI -> GUI
+GUI -> DAC

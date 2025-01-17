@@ -1,0 +1,4 @@
+SSH -> SSH
+SSH -> DOS
+DOS -> SSH 
+DOS -> DOS 

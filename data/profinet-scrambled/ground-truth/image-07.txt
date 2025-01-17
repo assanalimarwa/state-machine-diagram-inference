@@ -1,0 +1,16 @@
+DPI -> SSH
+SSH -> SSH
+SSH -> RAM
+RAM -> SSH
+RAM -> RAM
+RAM -> IDE
+IDE -> RAM
+IDE -> IDE
+CRT -> CRT
+CRT -> CLI
+CLI -> CRT
+CLI -> CLI 
+CLI -> SSH
+CRT -> SSH 
+IDE -> SSH 
+RAM -> CRT

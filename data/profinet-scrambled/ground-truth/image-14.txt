@@ -1,0 +1,8 @@
+CSV -> CSV
+CSV -> XML
+XML -> CSV
+XML -> XML
+XML -> WAF
+WAF -> XML
+WAF -> WAF
+WAF -> CSV

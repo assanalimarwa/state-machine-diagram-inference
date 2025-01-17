@@ -1,0 +1,15 @@
+SLA -> SLA
+SLA -> CPU
+CPU -> SLA
+CPU -> CPU
+CPU -> XSS
+XSS -> XSS
+XSS -> SAS
+SAS -> SAS
+SAS -> ASP
+ASP -> ASP
+ASP -> SLA
+SAS -> SLA
+SAS -> CPU
+CPU -> ASP
+XSS -> ASP

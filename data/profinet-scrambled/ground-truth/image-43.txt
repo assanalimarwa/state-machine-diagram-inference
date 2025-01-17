@@ -1,0 +1,26 @@
+IOS -> NAT
+NAT -> CSS
+CSS -> NAT
+CSS -> CSS
+CSS -> PPT
+PPT -> PPT
+PPT -> CPU
+CPU -> IVR
+IVR -> IVR
+IVR -> EHR
+EHR -> EHR
+EHR -> CLI
+CLI -> CLI 
+CLI -> SSH 
+SSH -> SSH 
+SSH -> GPU
+GPU -> WAP
+WAP -> NAT
+PPT -> WAP
+CPU -> WAP
+IVR -> WAP
+EHR -> WAP
+CLI -> WAP
+SSH -> WAP
+CLI -> GPU
+

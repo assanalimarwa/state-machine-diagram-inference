@@ -1,0 +1,7 @@
+NFS -> NFS 
+NFS -> EXE 
+EXE -> EXE 
+EXE -> USB 
+USB -> USB 
+USB -> NFS
+NFS -> USB

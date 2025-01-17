@@ -1,0 +1,4 @@
+JSON -> JSON 
+JSON -> DOS 
+DOS -> DOS 
+DOS -> JSON

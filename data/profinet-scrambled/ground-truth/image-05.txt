@@ -1,0 +1,19 @@
+JVM -> ERP
+ERP -> ERP
+ERP -> CDN
+CDN -> ERP
+CDN -> CDN
+CDN -> USB
+USB -> USB
+USB -> LTE 
+LTE -> LTE 
+LTE -> WWW
+WWW -> WWW
+WWW -> ERP
+LTE -> ERP
+USB -> ERP
+WWW -> CDN
+LTE -> CDN
+CDN -> WWW
+USB -> WWW
+

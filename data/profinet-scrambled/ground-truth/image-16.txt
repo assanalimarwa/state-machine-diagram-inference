@@ -1,0 +1,12 @@
+PHP -> PHP
+RAM -> PHP
+RAM -> RAM
+RAM -> AIK
+AIK -> RAM
+AIK -> AIK 
+AIK -> IVR
+IVR -> IVR 
+IVR -> PHP
+IVR -> RAM
+AIK -> PHP
+PHP -> AIK

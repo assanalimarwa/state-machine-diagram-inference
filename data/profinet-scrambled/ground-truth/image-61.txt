@@ -1,0 +1,10 @@
+IDE -> IDE
+IDE -> VNC 
+VNC -> VNC 
+VNC -> IDE
+VNC -> MIM
+MIM -> MIM
+MIM -> XSS
+XSS -> XSS
+XSS -> IDE 
+MIM -> IDE

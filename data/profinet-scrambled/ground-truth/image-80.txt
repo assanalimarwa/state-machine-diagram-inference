@@ -1,0 +1,6 @@
+VMX -> WAP 
+WAP -> VPS 
+VPS -> VPS 
+VPS -> IOS 
+IOS -> VPS 
+WAP -> IOS 

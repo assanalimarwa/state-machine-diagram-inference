@@ -1,0 +1,4 @@
+SDK -> SDK
+SDK -> NAT
+NAT -> SDK
+NAT -> NAT

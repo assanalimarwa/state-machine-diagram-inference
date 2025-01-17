@@ -1,0 +1,14 @@
+VPN -> BIOS 
+BIOS -> VPN 
+BIOS -> BIOS 
+BIOS -> CPU 
+CPU -> CPU 
+CPU -> VMX 
+VMX -> VMX 
+VMX -> MIM 
+MIM -> MIM 
+MIM -> VPN 
+MIM -> BIOS
+VMX -> VPN 
+CPU -> VPN 
+CPU -> MIM

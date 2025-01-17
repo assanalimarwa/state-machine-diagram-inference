@@ -1,0 +1,17 @@
+SDK -> AIK, M
+AIK -> MAC, N
+BIOS -> SDK, L
+MAC -> BIOS, K
+MAC -> VPS, F
+MAC -> CPL, E
+JSO -> CPL, D
+XSS -> MAC, J
+MAC -> EXE, G
+EXE -> SQL, H
+SQL -> XSS
+LAN -> JSO, C
+VPS -> LAN, N
+WAP -> LAN, A
+WAP -> JSO, B
+ERP -> WAP, O
+GIF -> ERP, IVR

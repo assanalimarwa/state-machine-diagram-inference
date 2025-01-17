@@ -1,0 +1,4 @@
+RDP -> RDP 
+RDP -> JSON 
+JSON -> RDP 
+JSON -> JSON

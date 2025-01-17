@@ -1,0 +1,12 @@
+TCP -> IOS, RO 
+TCP -> API, N
+TCP -> OOP, SL
+OOP -> API, RD
+API -> IOS 
+IOS -> IVR, WA
+IVR -> IOS, D 
+IOS -> API, OS
+IOS -> TCP, CL
+API -> TCP, YML
+API -> IOT, AI 
+IOT -> TCP, BIOS

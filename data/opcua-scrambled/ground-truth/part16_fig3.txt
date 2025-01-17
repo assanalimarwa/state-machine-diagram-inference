@@ -1,0 +1,3 @@
+TCP -> RAM 
+RAM -> TCP, WWW, DNS
+RAM -> TCP, ML

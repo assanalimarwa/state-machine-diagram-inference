@@ -1,0 +1,8 @@
+KVM -> KVM 
+KVM -> SQL 
+SQL -> KVM 
+SQL -> SQL 
+SQL -> ERP 
+ERP -> SQL
+ERP -> ERP 
+ERP -> KVM 
